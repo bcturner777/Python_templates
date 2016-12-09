@@ -10,7 +10,7 @@ import os
 from ipaddress import IPv4Network
 from slugify import slugify
 
-parameter_file = "wanex_parameters.json"
+parameter_file = "wanex-parameters.json"
 template_file = "wanex-template.jinja2"
 output_directory = "template_output"
 
