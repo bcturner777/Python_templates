@@ -1,0 +1,266 @@
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname {{ site_code }}wanex1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+enable secret {{ secret_2nd_level }}
+!
+username network secret {{ secret_1st_level }}
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authentication enable default enable
+!
+aaa session-id common
+clock timezone timeezo 0 0
+system mtu routing 1500
+!
+!
+!
+no ip domain-lookup
+ip domain-name mentorg.com
+vtp domain mentor
+vtp mode transparent
+!
+cts server deadtime 0
+no cts server test all enable
+cts server test all idle-time 0
+cts server test all deadtime 0
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name mentor
+ revision 1
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 11
+ name INTRA-ACCESS
+!
+vlan 12
+ name UV-SERVICE
+!
+vlan 15
+ name U-SERVICE
+!
+vlan 17
+ name DMZ1
+!
+interface Port-channel1
+ description {{ site_code }}wanra1-outside
+ switchport access vlan 15
+ switchport mode access
+!
+interface GigabitEthernet0/1
+ description {{ site_code }}wangw0-g0/0-UV-Service
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/2
+ description {{ site_code }}wangw0-g0/1-U-Service
+ switchport access vlan 15
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/3
+ description {{ site_code }}wangw1-g0/0-Intra-Access
+ switchport access vlan 11
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/4
+ description {{ site_code }}wanfw1-eth0-UV-Service
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/5
+ description {{ site_code }}wanfw1-eth1-Intra-Access
+ switchport access vlan 11
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/6
+ description hsvwanfw1-eth2
+ switchport mode access
+ shutdown
+ spanning-tree portfast
+!
+interface GigabitEthernet0/7
+ description hsvwanfw1-eth3
+ switchport mode access
+ shutdown
+ spanning-tree portfast
+!
+interface GigabitEthernet0/8
+ description {{ site_code }}wanfd1-Intra-Access
+ switchport access vlan 11
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/9
+ description {{ site_code }}wanra1-eth0-U-Service
+ switchport access vlan 15
+ switchport mode access
+ shutdown
+ spanning-tree portfast
+!
+interface GigabitEthernet0/10
+ description {{ site_code }}wanra1-gi1/1-new
+ switchport access vlan 15
+ switchport mode access
+ channel-group 1 mode active
+!
+interface GigabitEthernet0/11
+ description {{ site_code }}wanra1-gi1/2-new
+ switchport access vlan 15
+ switchport mode access
+ channel-group 1 mode active
+!
+interface GigabitEthernet0/12
+ shutdown
+!
+interface GigabitEthernet0/13
+ shutdown
+!
+interface GigabitEthernet0/14
+ shutdown
+!
+interface GigabitEthernet0/15
+ shutdown
+!
+interface GigabitEthernet0/16
+ shutdown
+!
+interface GigabitEthernet0/17
+ shutdown
+!
+interface GigabitEthernet0/18
+ shutdown
+!
+interface GigabitEthernet0/19
+ shutdown
+!
+interface GigabitEthernet0/20
+ shutdown
+!
+interface GigabitEthernet0/21
+ shutdown
+!
+interface GigabitEthernet0/22
+ shutdown
+!
+interface GigabitEthernet0/23
+ shutdown
+!
+interface GigabitEthernet0/24
+ shutdown
+!
+interface GigabitEthernet0/25
+ description virtual uplink to router (unused)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport protected
+ shutdown
+!
+interface GigabitEthernet0/26
+ description virtual uplink to router (unused)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport protected
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan11
+ description {{ site_code }}wanex1
+ ip address 134.86.111.3 255.255.255.240
+!
+ip default-gateway {{ default_gateway }}
+no ip http server
+no ip http secure-server
+logging host 147.34.25.108
+logging host 147.34.26.107
+access-list 10 permit 192.94.31.2
+access-list 10 permit 192.94.38.34
+access-list 10 permit 137.202.0.0 0.0.255.255
+access-list 10 permit 147.34.0.0 0.0.255.255
+access-list 10 permit 134.86.0.0 0.0.255.255
+access-list 10 permit 172.16.0.0 0.15.255.255
+access-list 10 permit 192.168.0.0 0.0.255.255
+access-list 10 deny   any
+snmp-server community ROIGHRY7XUHMH RO
+snmp-server community RWIGS015XWDNT RW
+snmp-server location {{ snmp_location }} {{ city }}, {{state_or_country}}
+snmp-server contact GHD 503-685-7777
+snmp-server host 147.34.89.129 version 2c public
+snmp-server host 147.34.94.39 version 2c public
+!
+ip ssh maxstartups 5
+ip ssh time-out 30
+ip ssh version 2
+!
+banner motd ^CCCCCCCC
+
+This is a private system operated for Mentor Graphics company business.
+Authorization from Mentor Graphics management is required to use this
+system.
+Use by unauthorized persons is prohibited.
+
+{{ site_code }}wanex1 {{ city }}, {{state_or_country}}   Cisco 24port switch module inside gw0
+
+
+^C
+!
+line con 0
+ flowcontrol software
+line vty 0 4
+ access-class 10 in
+ transport input telnet ssh
+ transport output telnet ssh
+line vty 5 15
+ access-class 10 in
+ transport input telnet ssh
+ transport output telnet ssh
+!
+ntp server 147.34.104.33
+ntp server 137.202.0.49
+end
+!
+{% for interface in interfaces %}
+{% set vlan_name = interface.name|slugify_string %}
+{% if vendor == "Cisco_IOS" %}
+{% set subnet_mask = interface.prefix_length|dotted_decimal  %}
+vlan {{ interface.vlan_id }}
+ name {{ vlan_name }}
+interface vlan{{ interface.vlan_id }}
+ description *** IP interface for {{ interface.name }} (VLAN {{ interface.vlan_id }})
+ ip address {{ interface.ip_address }} {{ subnet_mask }}
+!
+{% elif vendor == "Juniper" %}
+set vlans {{ vlan_name }} vlan-id {{ interface.vlan_id }}
+edit interfaces vlan unit {{ interface.vlan_id }}
+set family inet address {{ interface.ip_address }}/{{ interface.prefix_length }}
+set description "*** IP interface for {{ interface.name }} (VLAN {{ interface.vlan_id }})"
+top
+set vlans {{ vlan_name }} l3-interface vlan.{{ interface.vlan_id }}
+!
+{% else %}
+! WARNING: UNKNOWN VENDOR
+{% endif %}
+{% endfor %}
+!
