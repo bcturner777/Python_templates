@@ -1,3 +1,4 @@
+{% for config in wanex_config %}
 {% if vendor == "Cisco_IOS" %}
 !
 service timestamps debug datetime msec
@@ -243,3 +244,4 @@ ntp server 137.202.0.49
 end
 !
 {% endif %}
+{% endfor %}
