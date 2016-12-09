@@ -66,9 +66,9 @@ if __name__ == "__main__":
         }
         parameter.update(interface_parameter_json.copy())
         result = template.render(parameter)
-        f = open(os.path.join(output_directory, site_code + "wanex.config"), "w")
+        f = open(os.path.join(output_directory, "wanex.config"), "w")
         f.write(result)
         f.close()
-        print("Configuration '%s' created for %s" % (site_code + "wanex.config", vendor))
+        print("Configuration '%s' created for %s" % ("wanex.config", vendor))
 
 print("DONE")
