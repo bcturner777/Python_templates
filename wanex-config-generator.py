@@ -36,39 +36,35 @@ def slugify_string(text):
     """
     return slugify(text)
 
-if __name__ == "__main__":
-    # create Jinja2 template environment with the link to the current directory
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath="."),
-                             trim_blocks=True,
-                             lstrip_blocks=True)
+print("Read JSON parameter file...")
+config_parameters = json.load(open(parameter_file))
+
+# next we need to create the central Jinja2 environment and we will load
+# the Jinja2 template file (the two parameters ensure a clean output in the
+# configuration file)
+
+print "Create the Jinja2 environment..."
+env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath="."),
+                         trim_blocks=True,
+                         lstrip_blocks=True)
 
     # register custom filters on the jinja2 environment
-    env.filters["dotted_decimal"] = dotted_decimal
-    env.filters["slugify_string"] = slugify_string
+env.filters["dotted_decimal"] = dotted_decimal
+env.filters["slugify_string"] = slugify_string
+# load template file
+template = env.get_template(template_file)
 
-    # load template file
-    template = env.get_template(template_file)
+# just make sure that the output directory exists
+if not os.path.exists(output_directory):
+    os.mkdir(output_directory)
 
-    # just make sure that the output directory exists
-    if not os.path.exists(output_directory):
-        os.mkdir(output_directory)
-
-    print("Load common parameter set and define vendors...")
-    vendors = ["Cisco_IOS"]
-    interface_parameter_json = json.load(open(parameter_file))
-
-    # create the templates for all vendors
-    print("Create templates for all vendors...")
-    for vendor in vendors:
-        parameter = {
-            "vendor": vendor,
-            "feature_string": ["Infrastructure ACLs"],
-        }
-        parameter.update(interface_parameter_json.copy())
-        result = template.render(parameter)
-        f = open(os.path.join(output_directory, "wanex.config"), "w")
-        f.write(result)
-        f.close()
-        print("Configuration '%s' created for %s" % ("wanex.config", vendor))
+# create the templates for all vendors
+print("Create templates...")
+for parameter in config_parameters:
+    result = template.render(parameter)
+    f = open(os.path.join(output_directory, "wanex.config"), "w")
+    f.write(result)
+    f.close()
+    print("Configuration '%s' created for %s" % ("wanex.config", vendor))
 
 print("DONE")
