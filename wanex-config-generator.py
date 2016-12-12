@@ -28,13 +28,13 @@ def dotted_decimal(prefix_length):
         return "[INVALID VALUE(" + str(prefix_length) + ")]"
 
 
-def slugify_string(text):
-    """
-    convert the given string to a slug
-    :param text:
-    :return:
-    """
-    return slugify(text)
+#def slugify_string(text):
+#    """
+#    convert the given string to a slug
+#    :param text:
+#    :return:
+#    """
+#    return slugify(text)
 
 print("Read JSON parameter file...")
 config_parameters = json.load(open(parameter_file))
@@ -50,7 +50,7 @@ env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath="."),
 
     # register custom filters on the jinja2 environment
 env.filters["dotted_decimal"] = dotted_decimal
-env.filters["slugify_string"] = slugify_string
+#env.filters["slugify_string"] = slugify_string
 # load template file
 template = env.get_template(template_file)
 
