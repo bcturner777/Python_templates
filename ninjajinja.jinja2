@@ -1,0 +1,12 @@
+{% for key in config_parameters %}
+{% set subnet_mask = key["prefix_length"]|dotted_decimal %}
+**** This is a test template output from data rendered by python from a JSON dictionary ****
+site code        = {{ key["site_code"] }}
+secret 1st level = {{ key["secret_1st_level"] }}
+secret 2nd level = {{ key["secret_2nd_level"] }}
+IP address       = {{ key["ip_address"] }} {{ subnet_mask }}
+default gateway  = {{ key["default_gateway"] }}
+snmp location    = {{ key["snmp_location"] }}
+city             = {{ key["city"] }}
+state or country = {{ key["state_or_country"] }}
+{% endfor %}
