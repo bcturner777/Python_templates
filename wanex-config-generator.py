@@ -60,11 +60,17 @@ if not os.path.exists(output_directory):
 
 # create the templates for all vendors
 print("Create templates...")
-for parameter in config_parameters:
-    result = template.render(parameter)
-    f = open(os.path.join(output_directory, "wanex.config"), "w")
-    f.write(result)
-    f.close()
-    print("Configuration '%s' created for %s" % ("wanex.config", vendor))
+#for parameter in config_parameters:
+#    print parameter
+print "config_parameters dictionary below"
+print config_parameters
+print template
+# http://jinja.pocoo.org/docs/dev/api/
+# Python 2.7 render function requires two iterators
+result = template.render(config_parameters=config_parameters)
+f = open(os.path.join(output_directory, "wanex.config"), "w")
+f.write(result)
+f.close()
+#    print("Configuration '%s' created for %s" % ("wanex.config"))
 
 print("DONE")

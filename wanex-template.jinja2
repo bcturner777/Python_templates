@@ -1,20 +1,20 @@
-{% for config in wanex_config %}
-{% if vendor == "Cisco_IOS" %}
+{% for key in config_parameters %}
+{% set subnet_mask = key["prefix_length"]|dotted_decimal %}
 !
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname {{ site_code }}wanex1
+hostname {{ key["site_code"] }}wanex1
 !
 boot-start-marker
 boot-end-marker
 !
 !
 no logging console
-enable secret {{ secret_2nd_level }}
+enable secret {{ key["secret_2nd_level"] }}
 !
-username network secret {{ secret_1st_level }}
+username network secret {{ key["secret_1st_level"] }}
 aaa new-model
 !
 !
@@ -60,73 +60,73 @@ vlan 17
  name DMZ1
 !
 interface Port-channel1
- description {{ site_code }}wanra1-outside
+ description {{ key["site_code"] }}wanra1-outside
  switchport access vlan 15
  switchport mode access
 !
 interface GigabitEthernet0/1
- description {{ site_code }}wangw0-g0/0-UV-Service
+ description {{ key["site_code"] }}wangw0-g0/0-UV-Service
  switchport access vlan 12
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/2
- description {{ site_code }}wangw0-g0/1-U-Service
+ description {{ key["site_code"] }}wangw0-g0/1-U-Service
  switchport access vlan 15
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/3
- description {{ site_code }}wangw1-g0/0-Intra-Access
+ description {{ key["site_code"] }}wangw1-g0/0-Intra-Access
  switchport access vlan 11
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/4
- description {{ site_code }}wanfw1-eth0-UV-Service
+ description {{ key["site_code"] }}wanfw1-eth0-UV-Service
  switchport access vlan 12
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/5
- description {{ site_code }}wanfw1-eth1-Intra-Access
+ description {{ key["site_code"] }}wanfw1-eth1-Intra-Access
  switchport access vlan 11
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/6
- description hsvwanfw1-eth2
+ description {{ key["site_code"] }}wanfw1-eth2
  switchport mode access
  shutdown
  spanning-tree portfast
 !
 interface GigabitEthernet0/7
- description hsvwanfw1-eth3
+ description {{ key["site_code"] }}wanfw1-eth3
  switchport mode access
  shutdown
  spanning-tree portfast
 !
 interface GigabitEthernet0/8
- description {{ site_code }}wanfd1-Intra-Access
+ description {{ key["site_code"] }}wanfd1-Intra-Access
  switchport access vlan 11
  switchport mode access
  spanning-tree portfast
 !
 interface GigabitEthernet0/9
- description {{ site_code }}wanra1-eth0-U-Service
+ description {{ key["site_code"] }}wanra1-eth0-U-Service
  switchport access vlan 15
  switchport mode access
  shutdown
  spanning-tree portfast
 !
 interface GigabitEthernet0/10
- description {{ site_code }}wanra1-gi1/1-new
+ description {{ key["site_code"] }}wanra1-gi1/1-new
  switchport access vlan 15
  switchport mode access
  channel-group 1 mode active
 !
 interface GigabitEthernet0/11
- description {{ site_code }}wanra1-gi1/2-new
+ description {{ key["site_code"] }}wanra1-gi1/2-new
  switchport access vlan 15
  switchport mode access
  channel-group 1 mode active
@@ -189,10 +189,10 @@ interface Vlan1
  shutdown
 !
 interface Vlan11
- description {{ site_code }}wanex1
- ip address 134.86.111.3 255.255.255.240
+ description {{ key["site_code"] }}wanex1
+ ip address {{ key["ip_address"] }} {{ subnet_mask }}
 !
-ip default-gateway {{ default_gateway }}
+ip default-gateway {{ key["default_gateway"] }}
 no ip http server
 no ip http secure-server
 logging host 147.34.25.108
@@ -207,7 +207,7 @@ access-list 10 permit 192.168.0.0 0.0.255.255
 access-list 10 deny   any
 snmp-server community ROIGHRY7XUHMH RO
 snmp-server community RWIGS015XWDNT RW
-snmp-server location {{ snmp_location }} {{ city }}, {{state_or_country}}
+snmp-server location {{ key["snmp_location"] }} {{ key["city"] }}, {{ key["state_or_country"] }}
 snmp-server contact GHD 503-685-7777
 snmp-server host 147.34.89.129 version 2c public
 snmp-server host 147.34.94.39 version 2c public
@@ -223,7 +223,7 @@ Authorization from Mentor Graphics management is required to use this
 system.
 Use by unauthorized persons is prohibited.
 
-{{ site_code }}wanex1 {{ city }}, {{state_or_country}}   Cisco 24port switch module inside gw0
+{{ key["site_code"] }}wanex1 {{ key["city"] }}, {{ key["state_or_country"] }}   Cisco 24port switch module inside gw0
 
 
 ^C
@@ -243,5 +243,4 @@ ntp server 147.34.104.33
 ntp server 137.202.0.49
 end
 !
-{% endif %}
 {% endfor %}
