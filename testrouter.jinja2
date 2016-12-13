@@ -1,0 +1,102 @@
+{% for key in config_parameters %}
+{% set subnet_mask = key["prefix_length"]|dotted_decimal %}
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname {{ key["site_code"] }}-ansible-rtr
+!
+boot-start-marker
+boot-end-marker
+!
+logging message-counter syslog
+logging buffered 6144 informational
+logging rate-limit 20
+logging console informational
+enable secret {{ key["secret_2nd_level"] }}
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authentication enable default enable
+!
+!
+aaa session-id common
+dot11 syslog
+ip source-route
+!
+!
+!
+!
+ip cef
+no ip domain lookup
+ip domain name tah.mentorg.com
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+username cisco secret {{ key["secret_1st_level"] }}
+archive
+ log config
+  hidekeys
+!
+!
+ip ssh maxstartups 5
+ip ssh time-out 25
+ip ssh version 2
+ip ssh dh min size 4096
+!
+!
+!
+interface FastEthernet0/0
+ ip address {{ key["ip_address"] }} {{ subnet_mask }}
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 {{ key["default_gateway"] }}
+!
+no ip http server
+no ip http secure-server
+!
+!
+logging 147.34.94.39
+snmp-server location {{ key["snmp_location"] }} {{ key["city"] }}, {{ key["state_or_country"] }}
+!
+!
+!
+banner motd ^C
+***********************************************************************
+***********************************************************************
+This is a private system operated for GNS monkey business.
+{{ key["site_code"] }}-ansible-rtr {{ key["city"] }}, {{ key["state_or_country"] }}
+****** Test router for GNS Network Automation skillz development ******
+^C
+
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 15 0
+line aux 0
+line vty 0 4
+ exec-timeout 45 0
+!
+scheduler allocate 20000 1000
+ntp server 147.34.104.33
+ntp server 137.202.0.49
+end
+{% endfor %}

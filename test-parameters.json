@@ -1,0 +1,13 @@
+[
+{
+    "site_code": "aaa",
+    "ip_address": "134.86.133.30",
+    "prefix_length": 24,
+    "default_gateway": "134.86.133.254",
+    "secret_2nd_level": "cisco",
+    "secret_1st_level": "cisco",
+    "snmp_location": "NA_AAA",
+    "city": "Eagle Point",
+    "state_or_country": "USA"
+}
+]
